@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미니게임 컬렉션 | Fun Games</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">🎮 Fun Games</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">홈</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">소개</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#games" class="nav-link">게임</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#leaderboard" class="nav-link">랭킹</a>
+                </li>
+            </ul>
+            <div class="theme-toggle">
+                <button id="theme-toggle-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 섹션 -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    재미있는<br>
+                    <span class="highlight">미니게임</span> 컬렉션
+                </h1>
+                <p class="hero-subtitle">
+                    다양한 미니게임들을 즐겨보세요! 
+                    숫자 맞추기, 메모리 카드, 퍼즐 등 다양한 게임이 준비되어 있습니다.
+                </p>
+                <div class="player-info">
+                    <div class="player-name-section">
+                        <label for="player-name-input">플레이어 이름:</label>
+                        <input type="text" id="player-name-input" placeholder="이름을 입력하세요" maxlength="20">
+                        <button id="save-player-name" class="btn btn-primary">저장</button>
+                    </div>
+                    <div class="current-player">
+                        현재 플레이어: <span id="current-player-display">익명</span>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    <a href="#about" class="btn btn-primary">게임 소개 보기</a>
+                    <a href="#games" class="btn btn-secondary">게임 시작하기</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="floating-card">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 소개 섹션 -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">게임 소개</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>다양한 미니게임을 즐겨보세요!</h3>
+                    <p>
+                        이 웹사이트는 다양한 미니게임들을 모아놓은 컬렉션입니다. 
+                        각 게임은 서로 다른 기술과 재미를 제공하며, 
+                        최고 기록을 갱신하며 경쟁해보세요!
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-trophy"></i>
+                            <h4>최고 기록</h4>
+                            <p>각 게임의 최고 기록을 저장하고 관리합니다.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-chart-line"></i>
+                            <h4>통계</h4>
+                            <p>게임 플레이 통계를 확인할 수 있습니다.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-users"></i>
+                            <h4>랭킹</h4>
+                            <p>다른 플레이어들과 순위를 비교해보세요.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="stats-card">
+                        <h4>전체 통계</h4>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-games">0</span>
+                                <span class="stat-label">총 게임 수</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-time">0</span>
+                                <span class="stat-label">총 플레이 시간</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="best-score">0</span>
+                                <span class="stat-label">최고 점수</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 게임 섹션 -->
+    <section id="games" class="games">
+        <div class="container">
+            <h2 class="section-title">게임 목록</h2>
+            <div class="games-grid">
+                <!-- 숫자 맞추기 게임 -->
+                <div class="game-card" data-game="number-guess">
+                    <div class="game-icon">
+                        <i class="fas fa-dice"></i>
+                    </div>
+                    <div class="game-content">
+                        <h3>숫자 맞추기</h3>
+                        <p>1부터 100 사이의 숫자를 맞춰보세요!</p>
+                        <div class="game-stats">
+                            <span class="stat">최고 기록: <span id="number-best">-</span></span>
+                            <span class="stat">점수: <span id="number-attempts">-</span></span>
+                        </div>
+                        <button class="btn btn-primary play-btn">게임 시작</button>
+                    </div>
+                </div>
+
+                <!-- 메모리 카드 게임 -->
+                <div class="game-card" data-game="memory-card">
+                    <div class="game-icon">
+                        <i class="fas fa-clone"></i>
+                    </div>
+                    <div class="game-content">
+                        <h3>메모리 카드</h3>
+                        <p>같은 카드 쌍을 찾아서 뒤집으세요!</p>
+                        <div class="game-stats">
+                            <span class="stat">최고 기록: <span id="memory-best">-</span></span>
+                            <span class="stat">점수: <span id="memory-moves">-</span></span>
+                        </div>
+                        <button class="btn btn-primary play-btn">게임 시작</button>
+                    </div>
+                </div>
+
+                <!-- 퍼즐 게임 -->
+                <div class="game-card" data-game="puzzle">
+                    <div class="game-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <div class="game-content">
+                        <h3>슬라이딩 퍼즐</h3>
+                        <p>숫자들을 올바른 순서로 배열해보세요!</p>
+                        <div class="game-stats">
+                            <span class="stat">최고 기록: <span id="puzzle-best">-</span></span>
+                            <span class="stat">점수: <span id="puzzle-moves">-</span></span>
+                        </div>
+                        <button class="btn btn-primary play-btn">게임 시작</button>
+                    </div>
+                </div>
+
+                <!-- 타자 게임 -->
+                <div class="game-card" data-game="typing">
+                    <div class="game-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <div class="game-content">
+                        <h3>타자 게임</h3>
+                        <p>빠르고 정확하게 단어를 타이핑해보세요!</p>
+                        <div class="game-stats">
+                            <span class="stat">최고 기록: <span id="typing-best">-</span></span>
+                            <span class="stat">시간(초): <span id="typing-wpm">-</span></span>
+                        </div>
+                        <button class="btn btn-primary play-btn">게임 시작</button>
+                    </div>
+                </div>
+
+                <!-- 색상 맞추기 게임 -->
+                <div class="game-card" data-game="color-match">
+                    <div class="game-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="game-content">
+                        <h3>색상 맞추기</h3>
+                        <p>제시된 색상과 같은 색상을 찾아보세요!</p>
+                        <div class="game-stats">
+                            <span class="stat">최고 기록: <span id="color-best">-</span></span>
+                            <span class="stat">점수: <span id="color-accuracy">-</span></span>
+                        </div>
+                        <button class="btn btn-primary play-btn">게임 시작</button>
+                    </div>
+                </div>
+
+                <!-- 반응 속도 게임 -->
+                <div class="game-card" data-game="reaction">
+                    <div class="game-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="game-content">
+                        <h3>반응 속도 테스트</h3>
+                        <p>색이 변하는 순간을 빠르게 클릭해보세요!</p>
+                        <div class="game-stats">
+                            <span class="stat">최고 기록: <span id="reaction-best">-</span></span>
+                            <span class="stat">평균 속도: <span id="reaction-avg">-</span></span>
+                        </div>
+                        <button class="btn btn-primary play-btn">게임 시작</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 게임 모달 -->
+    <div id="game-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">게임 제목</h3>
+                <button class="close-btn" id="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="game-container">
+                    <!-- 게임 내용이 여기에 동적으로 로드됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 랭킹 섹션 -->
+    <section id="leaderboard" class="leaderboard">
+        <div class="container">
+            <h2 class="section-title">랭킹</h2>
+            <div class="leaderboard-tabs">
+                <button class="tab-btn active" data-game="number-guess">숫자 맞추기</button>
+                <button class="tab-btn" data-game="memory-card">메모리 카드</button>
+                <button class="tab-btn" data-game="puzzle">퍼즐</button>
+                <button class="tab-btn" data-game="typing">타자</button>
+                <button class="tab-btn" data-game="color-match">색상 맞추기</button>
+                <button class="tab-btn" data-game="reaction">반응 속도</button>
+            </div>
+            <div class="leaderboard-content">
+                <div class="leaderboard-table">
+                    <div class="table-header">
+                        <span>순위</span>
+                        <span>플레이어</span>
+                        <span>점수</span>
+                        <span>날짜</span>
+                    </div>
+                    <div id="leaderboard-list">
+                        <!-- 랭킹 데이터가 여기에 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 미니게임 컬렉션. 즐거운 게임 되세요! 🎮</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="games/numberGuess.js"></script>
+    <script src="games/memoryCard.js"></script>
+    <script src="games/puzzle.js"></script>
+    <script src="games/typing.js"></script>
+    <script src="games/colorMatch.js"></script>
+    <script src="games/reaction.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+// Typing game module (10 words, measure seconds)
+window.Games = window.Games || {};
+window.Games.loadTypingGame = function(deps) {
+    const { gameContainer, updateGameStats } = deps;
+
+    const words = [
+        'javascript', 'html', 'css', 'react', 'vue', 'angular', 'node', 'python',
+        'java', 'csharp', 'php', 'ruby', 'go', 'rust', 'swift', 'kotlin'
+    ];
+    let currentWordIndex = 0;
+    let startTime = null;
+    let correctChars = 0;
+    let totalChars = 0;
+    
+    gameContainer.innerHTML = `
+        <div class="game-container">
+            <div class="game-info">
+                <span>시간(초): <span id="wpm">0</span></span>
+                <span>정확도: <span id="accuracy">0</span>%</span>
+                <span>단어: <span id="word-count">0</span>/10</span>
+            </div>
+            <div class="game-controls">
+                <button class="btn btn-secondary" id="new-game-btn">새 게임</button>
+            </div>
+            <div class="game-area">
+                <div id="word-display" style="font-size: 2rem; margin: 2rem 0; color: var(--text-primary);"></div>
+                <input type="text" id="typing-input" placeholder="단어를 입력하세요" style="width: 100%; padding: 1rem; font-size: 1.2rem; border: 2px solid var(--border-color); border-radius: 10px; margin-bottom: 1rem;">
+                <div id="timer" style="font-size: 1.5rem; color: var(--primary-color);"></div>
+            </div>
+        </div>
+    `;
+    
+    const wordDisplay = document.getElementById('word-display');
+    const typingInput = document.getElementById('typing-input');
+    const wpmSpan = document.getElementById('wpm');
+    const accuracySpan = document.getElementById('accuracy');
+    const wordCountSpan = document.getElementById('word-count');
+    const timerDiv = document.getElementById('timer');
+    const newGameBtn = document.getElementById('new-game-btn');
+    
+    function startGame() {
+        currentWordIndex = 0;
+        correctChars = 0;
+        totalChars = 0;
+        startTime = Date.now();
+        displayNextWord();
+        typingInput.disabled = false;
+        typingInput.focus();
+    }
+    
+    function displayNextWord() {
+        if (currentWordIndex < 10) {
+            wordDisplay.textContent = words[Math.floor(Math.random() * words.length)];
+            wordCountSpan.textContent = currentWordIndex + 1;
+            typingInput.value = '';
+        } else {
+            endGame();
+        }
+    }
+    
+    function endGame() {
+        const timeTakenSec = Math.round((Date.now() - startTime) / 1000); // 초 단위 반올림
+        const accuracy = Math.round((correctChars / totalChars) * 100) || 0;
+        
+        typingInput.disabled = true;
+        wordDisplay.textContent = `게임 종료! 시간: ${timeTakenSec}초, 정확도: ${accuracy}%`;
+        timerDiv.textContent = '';
+        
+        // 점수(score)에는 걸린 시간(초)을 저장, 낮을수록 좋음
+        updateGameStats('typing', timeTakenSec, accuracy);
+    }
+    
+    function updateStats() {
+        if (startTime) {
+            const timeElapsedSec = Math.round((Date.now() - startTime) / 1000);
+            const accuracy = Math.round((correctChars / totalChars) * 100) || 0;
+            
+            wpmSpan.textContent = timeElapsedSec; // 현재 경과 시간(초)
+            accuracySpan.textContent = accuracy;
+            timerDiv.textContent = `${timeElapsedSec}초`;
+        }
+    }
+    
+    typingInput.addEventListener('input', (e) => {
+        if (!startTime) startTime = Date.now();
+        
+        const currentWord = wordDisplay.textContent;
+        const typedWord = e.target.value;
+        
+        totalChars = typedWord.length;
+        correctChars = 0;
+        
+        for (let i = 0; i < typedWord.length; i++) {
+            if (typedWord[i] === currentWord[i]) {
+                correctChars++;
+            }
+        }
+        
+        updateStats();
+        
+        if (typedWord === currentWord) {
+            currentWordIndex++;
+            setTimeout(displayNextWord, 500);
+        }
+    });
+    
+    newGameBtn.addEventListener('click', () => window.Games.loadTypingGame(deps));
+    
+    startGame();
+};
+
+

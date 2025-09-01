@@ -13,7 +13,12 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 // MongoDB 연결
-const uri = process.env.MONGODB_URI || "mongodb+srv://junho20435642_db_user:j0qyq5aBZCOGVhAw@cluster0.vkbticy.mongodb.net/games?retryWrites=true&w=majority";
+const uri = process.env.MONGODB_URI;
+if (!uri) {
+    console.error('❌ MONGODB_URI 환경변수가 설정되지 않았습니다!');
+    console.error('❌ .env 파일에 MONGODB_URI를 설정하거나 환경변수를 설정해주세요.');
+    process.exit(1);
+}
 const client = new MongoClient(uri);
 
 // 데이터베이스 연결 함수

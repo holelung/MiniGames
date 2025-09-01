@@ -18,7 +18,7 @@ const currentPlayerDisplay = document.getElementById('current-player-display');
 // API 기본 URL - 환경에 따라 동적 설정
 const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://localhost:3000' 
-    : 'https://your-render-app-name.onrender.com') + '/api';
+    : 'https://minigames-7s1x.onrender.com') + '/api';
 
 // 플레이어 ID 및 이름 관리
 function getPlayerId() {

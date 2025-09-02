@@ -336,6 +336,13 @@ app.get('/api/overall-stats', async (req, res) => {
 // 앱 정보 API (버전 등)
 app.get('/api/app-info', async (req, res) => {
     try {
+        // 캐시 무효화 헤더 추가
+        res.set({
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        });
+        
         res.json({
             success: true,
             version: APP_VERSION,

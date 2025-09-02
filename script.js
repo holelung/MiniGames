@@ -35,7 +35,12 @@ const API_BASE_URL = (() => {
 // 앱 버전 로드
 async function loadAppVersion() {
     try {
-        const response = await fetch(`${API_BASE_URL}/app-info`);
+        const response = await fetch(`${API_BASE_URL}/app-info?t=${Date.now()}`, {
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
         if (response.ok) {
             const data = await response.json();
             const versionBadge = document.querySelector('.version-badge');

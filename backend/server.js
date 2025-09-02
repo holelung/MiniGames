@@ -55,7 +55,17 @@ app.post('/api/game-stats', async (req, res) => {
             time: time || 0,
             difficulty,
             date: new Date(),
-            createdAt: new Date()
+            createdAt: new Date(),
+            koreanDate: new Date().toLocaleString('ko-KR', {
+                timeZone: 'Asia/Seoul',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            })
         };
 
         const db = client.db('games');
@@ -104,7 +114,8 @@ app.get('/api/leaderboard/:gameType', async (req, res) => {
                 playerName: entry.playerName || '익명',
                 score: entry.score,
                 time: entry.time,
-                date: entry.date
+                date: entry.date,
+                koreanDate: entry.koreanDate
             }))
         });
         

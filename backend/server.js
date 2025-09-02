@@ -9,6 +9,11 @@ require('dotenv').config();
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 const APP_VERSION = packageJson.version;
 
+// 디버깅을 위한 로그 추가
+console.log('📦 package.json 경로:', path.join(__dirname, '..', 'package.json'));
+console.log('📦 읽어온 버전:', packageJson.version);
+console.log('📦 전체 package.json:', JSON.stringify(packageJson, null, 2));
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 

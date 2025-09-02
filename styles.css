@@ -52,7 +52,7 @@ html {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     line-height: 1.6;
     color: var(--text-primary);
     background-color: var(--bg-primary);
@@ -115,7 +115,7 @@ body {
 }
 
 .nav-link::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -5px;
     left: 0;
@@ -375,19 +375,19 @@ section {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .player-name-section label {
         min-width: auto;
     }
-    
+
     .player-name-section input {
         min-width: auto;
     }
-    
+
     .player-name-section button {
         align-self: flex-end;
     }
-    
+
     /* 모바일에서 버전 정보 숨기기 */
     .version-info {
         display: none;
@@ -486,11 +486,11 @@ section {
 
 .modal-content {
     background-color: var(--bg-primary);
-    margin: 2% auto;
+    margin: 5% auto;
     padding: 0;
     border-radius: 20px;
-    width: 90%;
-    max-width: 90%;
+    width: 80%; /* 90%에서 80%로 줄임 */
+    max-width: 1200px; /* 최대 너비 제한 추가 */
     overflow-y: auto;
     box-shadow: var(--shadow-heavy);
     animation: modalSlideIn 0.3s ease;
@@ -723,7 +723,8 @@ section {
 }
 
 @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateY(0px);
     }
     50% {
@@ -749,15 +750,21 @@ section {
 
 .game-info {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
+    justify-content: center;
     padding: 1rem;
     background: var(--bg-secondary);
     border-radius: 10px;
 }
 
+.game-info > span {
+    padding: 0 1rem;
+}
+.game-info > span:nth-child(-n + 2) {
+    border-right: 1px solid var(--border-color);
+}
+
 .game-controls {
-    margin-bottom: 2rem;
+    margin: 2rem;
 }
 
 .game-area {
@@ -768,36 +775,39 @@ section {
 .tetris-layout {
     display: flex;
     flex-direction: row;
+    justify-content: center;
     gap: 2rem;
-    max-width: 90%;
+    width: fit-content; /* 내용물에 맞춰 자동 조정 */
+    max-width: 90%; /* 최대 너비 제한 */
     margin: 0 auto;
-    
     max-height: 100vh;
 }
 
 .tetris-left-panel {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.5rem;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: stretch;
     flex-shrink: 0;
+    width: fit-content; /* 내용물에 맞춰 자동 조정 */
 }
 
 .tetris-right-panel {
-       display: flex;
+    display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.5rem;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: stretch;
     flex-shrink: 0;
+    width: fit-content; /* 내용물에 맞춰 자동 조정 */
 }
 
 .tetris-center-section {
-    display: flex;
+    /* display: flex;
     justify-content: center;
     align-items: flex-start;
-    flex: 1;
+    flex: 1; */
 }
 
 .tetris-right-section {
@@ -973,8 +983,8 @@ section {
 }
 
 .game-controls .btn {
-    flex: 1;
-    padding: 0.75rem 1rem;
+    /* flex: 1; */
+    padding: 0.75rem 2rem;
     font-size: 1rem;
     font-weight: 600;
 }
@@ -1052,75 +1062,75 @@ section {
 
     .modal-content {
         width: 95%;
-        margin: 10% auto;
+        margin: 15% auto; /* 10%에서 15%로 변경 */
     }
 
     .game-area {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .tetris-layout {
         max-width: 100%;
         gap: 1rem;
         height: auto;
         max-height: none;
     }
-    
+
     .tetris-top-panel {
         flex-direction: column;
         align-items: center;
         gap: 1rem;
     }
-    
+
     .tetris-bottom-panel {
         flex-direction: column;
         align-items: center;
         gap: 1rem;
     }
-    
+
     .next-target-container {
         order: 1;
         min-width: auto;
         width: 100%;
     }
-    
+
     .tetris-center-section {
         order: 2;
     }
-    
+
     .tetris-right-section {
         order: 3;
         min-width: auto;
         max-width: none;
         width: 100%;
     }
-    
+
     .tetris-board {
         width: 250px;
         height: 450px;
         max-height: 450px;
     }
-    
+
     .tetris-cell {
         width: 23px;
         height: 23px;
     }
-    
+
     .next-piece {
         width: 60px;
         height: 60px;
     }
-    
+
     .next-cell {
         width: 12px;
         height: 12px;
     }
-    
+
     .game-controls {
         flex-direction: column;
     }
-    
+
     .game-controls .btn {
         width: 100%;
     }
@@ -1131,17 +1141,17 @@ section {
         width: 200px;
         height: 360px;
     }
-    
+
     .tetris-cell {
         width: 18px;
         height: 18px;
     }
-    
+
     .next-piece {
         width: 50px;
         height: 50px;
     }
-    
+
     .next-cell {
         width: 10px;
         height: 10px;

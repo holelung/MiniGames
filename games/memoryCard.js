@@ -50,8 +50,8 @@ window.Games.loadMemoryCardGame = function(deps) {
         if (T <= T_star * 1.2) bonus += 5; // 최적 시간의 20% 이내
         if (T <= T_star * 1.5) bonus += 3; // 최적 시간의 50% 이내
         
-        // 최종 점수 (소수점 둘째자리까지, 최대 80점)
-        const finalScore = Math.max(0, Math.min(80, Math.round((baseScore + bonus) * 100) / 100));
+        // 최종 점수 (소수점 둘째자리까지, 최대 100점)
+        const finalScore = Math.max(0, Math.min(100, Math.round((baseScore + bonus) * 100) / 100));
         
         return finalScore;
     }

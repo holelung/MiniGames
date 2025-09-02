@@ -540,13 +540,13 @@ function updateGameStatsUI() {
             if (attemptsElement) attemptsElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
         } else if (gameType === 'memory-card') {
             const movesElement = document.getElementById('memory-moves');
-            if (movesElement) movesElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
+            if (movesElement) movesElement.textContent = stats.best ? `${Math.round(stats.best * 100) / 100}점` : '-'; // 점수 시스템으로 변경
         } else if (gameType === 'puzzle') {
             const movesElement = document.getElementById('puzzle-moves');
-            if (movesElement) movesElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
+            if (movesElement) movesElement.textContent = stats.best ? `${Math.round(stats.best * 100) / 100}점` : '-'; // 소수점 둘째자리까지 표시
         } else if (gameType === 'typing') {
             const wpmElement = document.getElementById('typing-wpm');
-            if (wpmElement) wpmElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
+            if (wpmElement) wpmElement.textContent = stats.best ? `${Math.round(stats.best * 100) / 100}점` : '-'; // 점수 시스템으로 변경
         } else if (gameType === 'color-match') {
             const accuracyElement = document.getElementById('color-accuracy');
             if (accuracyElement) accuracyElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
@@ -585,8 +585,11 @@ async function changeLeaderboardTab(gameType, event) {
         // 게임 섹션과 동일한 방식으로 플레이어명 표시
         const playerDisplay = getBestScoreText(entry.score, entry.playerName, entry.playerId);
         
-        const scoreLabel = gameType === 'typing' ? `${Math.round(entry.score * 100) / 100}초` : 
+        const scoreLabel = gameType === 'typing' ? `${Math.round(entry.score * 100) / 100}점` : 
                           gameType === 'puzzle' ? `${Math.round(entry.score * 100) / 100}점` :
+                          gameType === 'memory-card' ? `${Math.round(entry.score * 100) / 100}점` :
+                          gameType === 'number-guess' ? `${Math.round(entry.score * 100) / 100}회` :
+                          gameType === 'reaction' ? `${Math.round(entry.score * 100) / 100}ms` :
                           `${Math.round(entry.score * 100) / 100}`;
         
         // 한국 시간 형식으로 표시 (YYYY-MM-DD HH:MM:SS)

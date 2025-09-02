@@ -99,9 +99,10 @@ app.get('/api/leaderboard/:gameType', async (req, res) => {
         const db = client.db('games');
         
         // 게임 타입별로 정렬 기준 결정
-        // typing은 10단어 완료 시간(초)을 score로 저장하므로 낮을수록 좋음
+        // typing은 새로운 점수 계산 방식으로 높을수록 좋음
+        // memory-card는 새로운 점수 계산 방식으로 높을수록 좋음
         // puzzle은 새로운 점수 계산 방식으로 높을수록 좋음
-        const sortOrder = ['number-guess', 'memory-card', 'reaction', 'typing'].includes(gameType) 
+        const sortOrder = ['number-guess', 'reaction'].includes(gameType) 
             ? { score: 1 }  // 낮을수록 좋음
             : { score: -1 }; // 높을수록 좋음
         
@@ -138,8 +139,8 @@ app.get('/api/best-score/:gameType', async (req, res) => {
         
         const db = client.db('games');
         
-        // 게임 타입별로 정렬 기준 결정 (typing은 초가 낮을수록 좋음)
-        const sortOrder = ['number-guess', 'memory-card', 'reaction', 'typing'].includes(gameType) 
+        // 게임 타입별로 정렬 기준 결정 (typing은 점수가 높을수록 좋음)
+        const sortOrder = ['number-guess', 'reaction'].includes(gameType) 
             ? { score: 1 }  // 낮을수록 좋음
             : { score: -1 }; // 높을수록 좋음
         
@@ -183,10 +184,10 @@ app.get('/api/best-scores', async (req, res) => {
         const bestScores = {};
         
         for (const gameType of gameTypes) {
-            // 게임 타입별로 정렬 기준 결정 (typing은 초가 낮을수록 좋음)
-            const sortOrder = ['number-guess', 'memory-card', 'reaction', 'typing'].includes(gameType) 
-                ? { score: 1 }  // 낮을수록 좋음
-                : { score: -1 }; // 높을수록 좋음
+                    // 게임 타입별로 정렬 기준 결정 (typing은 점수가 높을수록 좋음)
+        const sortOrder = ['number-guess', 'reaction'].includes(gameType) 
+            ? { score: 1 }  // 낮을수록 좋음
+            : { score: -1 }; // 높을수록 좋음
             
             console.log(`🔍 ${gameType} 정렬 기준:`, sortOrder);
             
@@ -244,7 +245,7 @@ app.get('/api/player-stats/:playerId', async (req, res) => {
         
         stats.forEach(stat => {
             const { gameType, score } = stat;
-            const lowerIsBetter = ['number-guess', 'memory-card', 'reaction', 'typing'];
+            const lowerIsBetter = ['number-guess', 'reaction'];
             if (!bestScores[gameType] || (lowerIsBetter.includes(gameType) ? score < bestScores[gameType] : score > bestScores[gameType])) {
                 bestScores[gameType] = score;
             }
@@ -300,7 +301,7 @@ app.get('/api/overall-stats', async (req, res) => {
         // 각 게임별로 최고/최저 점수 계산 (게임 타입에 따라 다름)
         const processedGameStats = gameStats.map(stat => {
             const gameType = stat._id;
-            const lowerIsBetter = ['number-guess', 'memory-card', 'reaction', 'typing'];
+            const lowerIsBetter = ['number-guess', 'reaction'];
             
             if (lowerIsBetter.includes(gameType)) {
                 // 낮은 점수가 좋은 게임들
@@ -310,7 +311,7 @@ app.get('/api/overall-stats', async (req, res) => {
                     worstScore: stat.maxScore
                 };
             } else {
-                // 높은 점수가 좋은 게임들 (puzzle, color-match)
+                // 높은 점수가 좋은 게임들 (puzzle, color-match, memory-card, typing)
                 return {
                     ...stat,
                     bestScore: stat.maxScore,

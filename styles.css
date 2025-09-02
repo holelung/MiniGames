@@ -486,11 +486,12 @@ section {
 
 .modal-content {
     background-color: var(--bg-primary);
-    margin: 5% auto;
+    margin: 2% auto;
     padding: 0;
     border-radius: 20px;
     width: 90%;
     max-width: 600px;
+    overflow-y: auto;
     box-shadow: var(--shadow-heavy);
     animation: modalSlideIn 0.3s ease;
 }
@@ -525,7 +526,7 @@ section {
 }
 
 .modal-body {
-    padding: 2rem;
+    padding: 1rem;
     min-height: 400px; /* 400px에서 600px로 증가 */
     max-height: 80vh; /* 뷰포트 높이의 80%로 제한 */
     overflow-y: auto; /* 내용이 많으면 스크롤 가능 */

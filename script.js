@@ -16,9 +16,7 @@ const savePlayerNameBtn = document.getElementById('save-player-name');
 const currentPlayerDisplay = document.getElementById('current-player-display');
 
 // API 기본 URL - 환경에 따라 동적 설정
-const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:3000' 
-    : 'https://minigames-7s1x.onrender.com') + '/api';
+const API_BASE_URL = 'https://minigames-7s1x.onrender.com' + '/api';
 
 // 플레이어 ID 및 이름 관리
 function getPlayerId() {
@@ -752,6 +750,20 @@ async function updateGameStats(gameType, score, time) {
     const stats = gameData[gameType];
     stats.games++;
     
+    // 최고 점수 업데이트 (전체 최고 기록용)
+    if (gameType === 'number-guess' || gameType === 'memory-card' || gameType === 'puzzle' || gameType === 'reaction' || gameType === 'typing') {
+        // 낮은 점수가 좋은 게임들
+        if (!stats.best || score < stats.best) {
+            stats.best = score;
+        }
+    } else if (gameType === 'color-match') {
+        // 높은 점수가 좋은 게임
+        if (!stats.best || score > stats.best) {
+            stats.best = score;
+        }
+    }
+    
+    // 개인 최고 기록 업데이트
     if (gameType === 'number-guess') {
         if (!stats.personalBest || score < stats.personalBest) {
             stats.personalBest = score;
@@ -958,22 +970,22 @@ function updateGameStatsUI() {
         
         if (gameType === 'number-guess') {
             const attemptsElement = document.getElementById('number-attempts');
-            if (attemptsElement) attemptsElement.textContent = stats.attempts || '-';
+            if (attemptsElement) attemptsElement.textContent = stats.best || '-'; // 최고 점수로 변경
         } else if (gameType === 'memory-card') {
             const movesElement = document.getElementById('memory-moves');
-            if (movesElement) movesElement.textContent = stats.moves || '-';
+            if (movesElement) movesElement.textContent = stats.best || '-'; // 최고 점수로 변경
         } else if (gameType === 'puzzle') {
             const movesElement = document.getElementById('puzzle-moves');
-            if (movesElement) movesElement.textContent = stats.moves || '-';
+            if (movesElement) movesElement.textContent = stats.best || '-'; // 최고 점수로 변경
         } else if (gameType === 'typing') {
             const wpmElement = document.getElementById('typing-wpm');
-            if (wpmElement) wpmElement.textContent = stats.time || '-';
+            if (wpmElement) wpmElement.textContent = stats.best || '-'; // 최고 점수로 변경
         } else if (gameType === 'color-match') {
             const accuracyElement = document.getElementById('color-accuracy');
-            if (accuracyElement) accuracyElement.textContent = stats.best || '-'; // 이제 best가 최종 점수
+            if (accuracyElement) accuracyElement.textContent = stats.best || '-'; // 이미 최고 점수
         } else if (gameType === 'reaction') {
             const avgElement = document.getElementById('reaction-avg');
-            if (avgElement) avgElement.textContent = stats.best || '-'; // 이제 best가 평균속도(avgTime)
+            if (avgElement) avgElement.textContent = stats.best || '-'; // 이미 최고 점수
         }
     });
 }

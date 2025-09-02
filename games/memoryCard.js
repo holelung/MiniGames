@@ -3,18 +3,65 @@ window.Games = window.Games || {};
 window.Games.loadMemoryCardGame = function(deps) {
     const { gameContainer, updateGameStats } = deps;
 
-    const symbols = ['🎮', '🎲', '🎯', '🎪', '🎨', '🎭', '🎪', '🎨'];
+    const symbols = ['🍕', '🍦', '🎨', '🎭', '🦄', '🌈', '🎮', '🎲'];
     const cards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
     let flippedCards = [];
     let matchedPairs = 0;
     let moves = 0;
     let gameStartTime = Date.now();
     
+    // 메모리 카드 게임 설정 (16장 카드 기준)
+    const MEMORY_CONFIG = {
+        optimalMoves: 16, // 최적의 경우: 각 쌍을 한 번에 맞추는 경우
+        timeCoefficient: 0.7,
+        optimalTime: 30, // 30초 내에 완료하는 것을 목표
+        maxScore: 80 // 최대 점수 제한
+    };
+    
+    // 메모리 카드 점수 계산 함수
+    function calculateMemoryScore(moves, timeSeconds) {
+        const M = moves;
+        const T = timeSeconds;
+        const M_star = MEMORY_CONFIG.optimalMoves;
+        const T_star = MEMORY_CONFIG.optimalTime;
+        
+        // 정규화 효율
+        const E_m = Math.min(1, M_star / M);
+        const E_t = Math.min(1, T_star / T);
+        
+        // 가중 조화평균 (메모리 게임은 이동 횟수가 더 중요)
+        const w_m = 0.7, w_t = 0.3;
+        const E = (w_m + w_t) / (w_m/E_m + w_t/E_t);
+        
+        // 기본 점수 (최대 점수 제한)
+        const baseScore = Math.min(MEMORY_CONFIG.maxScore, 60 * E);
+        
+        // 보너스 점수 (운도 실력이므로 페널티 없이 보상)
+        let bonus = 0;
+        
+        // 이동 횟수 보너스 (운도 실력이므로 모든 경우에 보상)
+        if (M <= M_star * 1.1) bonus += 10; // 최적의 10% 이내
+        if (M <= M_star * 1.2) bonus += 7; // 최적의 20% 이내
+        if (M <= M_star * 1.3) bonus += 5; // 최적의 30% 이내
+        if (M <= M_star * 1.5) bonus += 3; // 최적의 50% 이내
+        
+        // 시간 보너스
+        if (T <= T_star) bonus += 8; // 최적 시간 달성
+        if (T <= T_star * 1.2) bonus += 5; // 최적 시간의 20% 이내
+        if (T <= T_star * 1.5) bonus += 3; // 최적 시간의 50% 이내
+        
+        // 최종 점수 (소수점 둘째자리까지, 최대 80점)
+        const finalScore = Math.max(0, Math.min(80, Math.round((baseScore + bonus) * 100) / 100));
+        
+        return finalScore;
+    }
+    
     gameContainer.innerHTML = `
         <div class="game-container">
             <div class="game-info">
                 <span>이동 횟수: <span id="moves">0</span></span>
                 <span>맞춘 쌍: <span id="pairs">0</span>/8</span>
+                <span>목표: 최소 이동으로 모든 쌍을 맞추세요</span>
             </div>
             <div class="game-controls">
                 <button class="btn btn-secondary" id="new-game-btn">새 게임</button>
@@ -83,9 +130,11 @@ window.Games.loadMemoryCardGame = function(deps) {
             
             if (matchedPairs === 8) {
                 const timeTaken = Math.floor((Date.now() - gameStartTime) / 1000);
+                const finalScore = calculateMemoryScore(moves, timeTaken);
+                
                 setTimeout(() => {
-                    alert(`🎉 축하합니다! ${moves}번의 이동으로 모든 카드를 맞췄습니다! (${timeTaken}초)`);
-                    updateGameStats('memory-card', moves, timeTaken);
+                    alert(`🎉 축하합니다! ${moves}번의 이동으로 모든 카드를 맞췄습니다! (${timeTaken}초)\n최종 점수: ${finalScore}점`);
+                    updateGameStats('memory-card', finalScore, timeTaken);
                 }, 500);
             }
         } else {

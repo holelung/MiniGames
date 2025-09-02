@@ -265,486 +265,6 @@ function loadGame(gameType) {
     }
 }
 
-// 숫자 맞추기 게임 (모듈로 이동)
-/* function loadNumberGuessGame() {
-    const targetNumber = Math.floor(Math.random() * 100) + 1;
-    let attempts = 0;
-    let gameStartTime = Date.now();
-    
-    gameContainer.innerHTML = `
-        <div class="game-container">
-            <div class="game-info">
-                <span>시도 횟수: <span id="attempts">0</span></span>
-                <span>힌트: <span id="hint">1-100 사이의 숫자를 입력하세요</span></span>
-            </div>
-            <div class="game-controls">
-                <input type="number" id="guess-input" placeholder="숫자를 입력하세요" min="1" max="100" style="width: 200px; height: 50px; font-size: 1.2rem; padding: 0 1rem; border: 2px solid var(--border-color); border-radius: 10px; margin-right: 1rem;">
-                <button class="btn btn-primary" id="guess-btn">확인</button>
-                <button class="btn btn-secondary" id="new-game-btn">새 게임</button>
-            </div>
-            <div class="game-area">
-                <div id="result" style="font-size: 1.2rem; margin: 1rem 0;"></div>
-            </div>
-        </div>
-    `;
-    
-    const guessInput = document.getElementById('guess-input');
-    const guessBtn = document.getElementById('guess-btn');
-    const newGameBtn = document.getElementById('new-game-btn');
-    const attemptsSpan = document.getElementById('attempts');
-    const hintSpan = document.getElementById('hint');
-    const resultDiv = document.getElementById('result');
-    
-    guessBtn.addEventListener('click', () => {
-        const guess = parseInt(guessInput.value);
-        attempts++;
-        attemptsSpan.textContent = attempts;
-        
-        if (guess === targetNumber) {
-            const timeTaken = Math.floor((Date.now() - gameStartTime) / 1000);
-            resultDiv.innerHTML = `
-                <div style="color: var(--success-color); font-weight: bold;">
-                    🎉 정답입니다! ${attempts}번 만에 맞췄습니다! (${timeTaken}초)
-                </div>
-            `;
-            updateGameStats('number-guess', attempts, timeTaken);
-            guessBtn.disabled = true;
-        } else if (guess < targetNumber) {
-            hintSpan.textContent = '더 큰 숫자입니다';
-            resultDiv.textContent = '더 큰 숫자를 입력해보세요!';
-        } else {
-            hintSpan.textContent = '더 작은 숫자입니다';
-            resultDiv.textContent = '더 작은 숫자를 입력해보세요!';
-        }
-        
-        guessInput.value = '';
-        guessInput.focus();
-    });
-    
-    newGameBtn.addEventListener('click', () => {
-        loadNumberGuessGame();
-    });
-    
-    guessInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            guessBtn.click();
-        }
-    });
-    
-    guessInput.focus();
-} */
-
-// 메모리 카드 게임 (모듈로 이동)
-/* function loadMemoryCardGame() {
-    const symbols = ['🎮', '🎲', '🎯', '🎪', '🎨', '🎭', '🎪', '🎨'];
-    const cards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
-    let flippedCards = [];
-    let matchedPairs = 0;
-    let moves = 0;
-    let gameStartTime = Date.now();
-    
-    gameContainer.innerHTML = `
-        <div class="game-container">
-            <div class="game-info">
-                <span>이동 횟수: <span id="moves">0</span></span>
-                <span>맞춘 쌍: <span id="pairs">0</span>/8</span>
-            </div>
-            <div class="game-controls">
-                <button class="btn btn-secondary" id="new-game-btn">새 게임</button>
-            </div>
-            <div class="game-area">
-                <div id="memory-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; max-width: 400px; margin: 0 auto;"></div>
-            </div>
-        </div>
-    `;
-    
-    const memoryGrid = document.getElementById('memory-grid');
-    const movesSpan = document.getElementById('moves');
-    const pairsSpan = document.getElementById('pairs');
-    const newGameBtn = document.getElementById('new-game-btn');
-    
-    cards.forEach((symbol, index) => {
-        const card = document.createElement('div');
-        card.className = 'memory-card';
-        card.dataset.index = index;
-        card.dataset.symbol = symbol;
-        card.style.cssText = `
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-game);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            transform: rotateY(180deg);
-        `;
-        card.innerHTML = '❓';
-        
-        card.addEventListener('click', () => {
-            if (flippedCards.length < 2 && !card.classList.contains('flipped') && !card.classList.contains('matched')) {
-                flipCard(card);
-            }
-        });
-        
-        memoryGrid.appendChild(card);
-    });
-    
-    function flipCard(card) {
-        card.style.transform = 'rotateY(0deg)';
-        card.innerHTML = card.dataset.symbol;
-        card.classList.add('flipped');
-        flippedCards.push(card);
-        
-        if (flippedCards.length === 2) {
-            moves++;
-            movesSpan.textContent = moves;
-            
-            setTimeout(() => {
-                checkMatch();
-            }, 1000);
-        }
-    }
-    
-    function checkMatch() {
-        const [card1, card2] = flippedCards;
-        
-        if (card1.dataset.symbol === card2.dataset.symbol) {
-            card1.classList.add('matched');
-            card2.classList.add('matched');
-            matchedPairs++;
-            pairsSpan.textContent = matchedPairs;
-            
-            if (matchedPairs === 8) {
-                const timeTaken = Math.floor((Date.now() - gameStartTime) / 1000);
-                setTimeout(() => {
-                    alert(`🎉 축하합니다! ${moves}번의 이동으로 모든 카드를 맞췄습니다! (${timeTaken}초)`);
-                    updateGameStats('memory-card', moves, timeTaken);
-                }, 500);
-            }
-        } else {
-            card1.style.transform = 'rotateY(180deg)';
-            card2.style.transform = 'rotateY(180deg)';
-            card1.innerHTML = '❓';
-            card2.innerHTML = '❓';
-            card1.classList.remove('flipped');
-            card2.classList.remove('flipped');
-        }
-        
-        flippedCards = [];
-    }
-    
-    newGameBtn.addEventListener('click', () => {
-        loadMemoryCardGame();
-    });
-} */
-
-// 슬라이딩 퍼즐 게임 (모듈로 이동)
-/* function loadPuzzleGame() {
-    const size = 3;
-    let tiles = Array.from({length: size * size - 1}, (_, i) => i + 1);
-    tiles.push(0); // 빈 타일
-    let moves = 0;
-    let gameStartTime = Date.now();
-    
-    // 타일 섞기
-    for (let i = 0; i < 100; i++) {
-        const emptyIndex = tiles.indexOf(0);
-        const possibleMoves = getPossibleMoves(emptyIndex, size);
-        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-        [tiles[emptyIndex], tiles[randomMove]] = [tiles[randomMove], tiles[emptyIndex]];
-    }
-    
-    gameContainer.innerHTML = `
-        <div class="game-container">
-            <div class="game-info">
-                <span>이동 횟수: <span id="moves">0</span></span>
-                <span>목표: 1부터 8까지 순서대로 배열하세요</span>
-            </div>
-            <div class="game-controls">
-                <button class="btn btn-secondary" id="new-game-btn">새 게임</button>
-            </div>
-            <div class="game-area">
-                <div id="puzzle-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem; max-width: 300px; margin: 0 auto;"></div>
-            </div>
-        </div>
-    `;
-    
-    const puzzleGrid = document.getElementById('puzzle-grid');
-    const movesSpan = document.getElementById('moves');
-    const newGameBtn = document.getElementById('new-game-btn');
-    
-    function renderPuzzle() {
-        puzzleGrid.innerHTML = '';
-        tiles.forEach((tile, index) => {
-            const tileElement = document.createElement('div');
-            tileElement.className = 'puzzle-tile';
-            tileElement.textContent = tile === 0 ? '' : tile;
-            tileElement.style.cssText = `
-                width: 80px;
-                height: 80px;
-                background: ${tile === 0 ? 'transparent' : 'var(--gradient-game)'};
-                border-radius: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.5rem;
-                font-weight: bold;
-                color: white;
-                cursor: ${tile === 0 ? 'default' : 'pointer'};
-                transition: transform 0.2s ease;
-            `;
-            
-            if (tile !== 0) {
-                tileElement.addEventListener('click', () => moveTile(index));
-            }
-            
-            puzzleGrid.appendChild(tileElement);
-        });
-    }
-    
-    function getPossibleMoves(emptyIndex, size) {
-        const moves = [];
-        const row = Math.floor(emptyIndex / size);
-        const col = emptyIndex % size;
-        
-        if (row > 0) moves.push(emptyIndex - size);
-        if (row < size - 1) moves.push(emptyIndex + size);
-        if (col > 0) moves.push(emptyIndex - 1);
-        if (col < size - 1) moves.push(emptyIndex + 1);
-        
-        return moves;
-    }
-    
-    function moveTile(index) {
-        const emptyIndex = tiles.indexOf(0);
-        const possibleMoves = getPossibleMoves(emptyIndex, size);
-        
-        if (possibleMoves.includes(index)) {
-            [tiles[emptyIndex], tiles[index]] = [tiles[index], tiles[emptyIndex]];
-            moves++;
-            movesSpan.textContent = moves;
-            renderPuzzle();
-            
-            // 승리 조건 확인
-            if (tiles.slice(0, -1).every((tile, i) => tile === i + 1) && tiles[tiles.length - 1] === 0) {
-                const timeTaken = Math.floor((Date.now() - gameStartTime) / 1000);
-                setTimeout(() => {
-                    alert(`🎉 축하합니다! ${moves}번의 이동으로 퍼즐을 완성했습니다! (${timeTaken}초)`);
-                    updateGameStats('puzzle', moves, timeTaken);
-                }, 500);
-            }
-        }
-    }
-    
-    renderPuzzle();
-    
-    newGameBtn.addEventListener('click', () => {
-        loadPuzzleGame();
-    });
-} */
-
-// 타자 게임
-// typing game moved to games/typing.js
-
-// 색상 맞추기 게임 (모듈로 이동)
-/* function loadColorMatchGame() {
-    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
-    let currentColor = '';
-    let correctAnswers = 0;
-    let totalAnswers = 0;
-    let gameStartTime = Date.now();
-    
-    gameContainer.innerHTML = `
-        <div class="game-container">
-            <div class="game-info">
-                <span>정답: <span id="correct">0</span></span>
-                <span>정확도: <span id="accuracy">0</span>%</span>
-                <span>라운드: <span id="round">1</span>/10</span>
-            </div>
-            <div class="game-controls">
-                <button class="btn btn-secondary" id="new-game-btn">새 게임</button>
-            </div>
-            <div class="game-area">
-                <div id="color-display" style="width: 200px; height: 100px; margin: 2rem auto; border-radius: 10px; border: 3px solid var(--border-color);"></div>
-                <div id="color-text" style="font-size: 1.5rem; margin: 1rem 0; color: var(--text-primary);"></div>
-                <div id="color-options" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 400px; margin: 0 auto;"></div>
-            </div>
-        </div>
-    `;
-    
-    const colorDisplay = document.getElementById('color-display');
-    const colorText = document.getElementById('color-text');
-    const colorOptions = document.getElementById('color-options');
-    const correctSpan = document.getElementById('correct');
-    const accuracySpan = document.getElementById('accuracy');
-    const roundSpan = document.getElementById('round');
-    const newGameBtn = document.getElementById('new-game-btn');
-    
-    const colorNames = {
-        '#ff6b6b': '빨강',
-        '#4ecdc4': '청록',
-        '#45b7d1': '파랑',
-        '#96ceb4': '초록',
-        '#feca57': '노랑',
-        '#ff9ff3': '분홍'
-    };
-    
-    function generateRound() {
-        const displayColor = colors[Math.floor(Math.random() * colors.length)];
-        const textColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        colorDisplay.style.backgroundColor = displayColor;
-        colorText.textContent = colorNames[textColor];
-        colorText.style.color = textColor;
-        
-        // 옵션 생성
-        colorOptions.innerHTML = '';
-        const shuffledColors = [...colors].sort(() => Math.random() - 0.5);
-        
-        shuffledColors.slice(0, 3).forEach(color => {
-            const option = document.createElement('button');
-            option.className = 'btn btn-primary';
-            option.style.cssText = `
-                width: 100%;
-                height: 60px;
-                background: ${color};
-                border: none;
-                border-radius: 10px;
-                cursor: pointer;
-                transition: transform 0.2s ease;
-            `;
-            
-            option.addEventListener('click', () => {
-                checkAnswer(color, textColor);
-            });
-            
-            colorOptions.appendChild(option);
-        });
-    }
-    
-    function checkAnswer(selectedColor, correctColor) {
-        totalAnswers++;
-        
-        if (selectedColor === correctColor) {
-            correctAnswers++;
-        }
-        
-        correctSpan.textContent = correctAnswers;
-        accuracySpan.textContent = Math.round((correctAnswers / totalAnswers) * 100);
-        
-        if (totalAnswers >= 10) {
-            const timeTaken = Math.floor((Date.now() - gameStartTime) / 1000);
-            setTimeout(() => {
-                alert(`게임 종료! 정확도: ${Math.round((correctAnswers / totalAnswers) * 100)}% (${timeTaken}초)`);
-                updateGameStats('color-match', correctAnswers, Math.round((correctAnswers / totalAnswers) * 100));
-            }, 500);
-        } else {
-            roundSpan.textContent = totalAnswers + 1;
-            setTimeout(generateRound, 1000);
-        }
-    }
-    
-    newGameBtn.addEventListener('click', () => {
-        loadColorMatchGame();
-    });
-    
-    generateRound();
-} */
-
-// 반응 속도 게임 (모듈로 이동)
-/* function loadReactionGame() {
-    let startTime = 0;
-    let reactionTimes = [];
-    let round = 1;
-    let isWaiting = false;
-    
-    gameContainer.innerHTML = `
-        <div class="game-container">
-            <div class="game-info">
-                <span>라운드: <span id="round">1</span>/5</span>
-                <span>평균: <span id="average">-</span>ms</span>
-                <span>최고 기록: <span id="best">-</span>ms</span>
-            </div>
-            <div class="game-controls">
-                <button class="btn btn-primary" id="start-btn">시작</button>
-                <button class="btn btn-secondary" id="new-game-btn">새 게임</button>
-            </div>
-            <div class="game-area">
-                <div id="reaction-area" style="width: 300px; height: 200px; margin: 2rem auto; border-radius: 15px; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; transition: background-color 0.3s ease;"></div>
-            </div>
-        </div>
-    `;
-    
-    const reactionArea = document.getElementById('reaction-area');
-    const startBtn = document.getElementById('start-btn');
-    const newGameBtn = document.getElementById('new-game-btn');
-    const roundSpan = document.getElementById('round');
-    const averageSpan = document.getElementById('average');
-    const bestSpan = document.getElementById('best');
-    
-    function startRound() {
-        if (round > 5) {
-            const avgTime = Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length);
-            const bestTime = Math.min(...reactionTimes);
-            
-            alert(`게임 종료! 평균: ${avgTime}ms, 최고 기록: ${bestTime}ms`);
-            updateGameStats('reaction', bestTime, avgTime);
-            return;
-        }
-        
-        roundSpan.textContent = round;
-        reactionArea.textContent = '대기 중...';
-        reactionArea.style.backgroundColor = 'var(--bg-secondary)';
-        isWaiting = true;
-        
-        const delay = Math.random() * 3000 + 1000; // 1-4초 랜덤
-        
-        setTimeout(() => {
-            if (isWaiting) {
-                reactionArea.textContent = '클릭하세요!';
-                reactionArea.style.backgroundColor = 'var(--success-color)';
-                startTime = Date.now();
-            }
-        }, delay);
-    }
-    
-    reactionArea.addEventListener('click', () => {
-        if (startTime > 0 && reactionArea.style.backgroundColor === 'var(--success-color)') {
-            const reactionTime = Date.now() - startTime;
-            reactionTimes.push(reactionTime);
-            
-            reactionArea.textContent = `${reactionTime}ms`;
-            reactionArea.style.backgroundColor = 'var(--primary-color)';
-            
-            const avgTime = Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length);
-            const bestTime = Math.min(...reactionTimes);
-            
-            averageSpan.textContent = avgTime;
-            bestSpan.textContent = bestTime;
-            
-            startTime = 0;
-            round++;
-            
-            setTimeout(startRound, 1000);
-        }
-    });
-    
-    startBtn.addEventListener('click', () => {
-        round = 1;
-        reactionTimes = [];
-        startRound();
-    });
-    
-    newGameBtn.addEventListener('click', () => {
-        loadReactionGame();
-    });
-    
-    startRound();
-} */
-
 // 게임 통계 업데이트 (MongoDB 연동)
 async function updateGameStats(gameType, score, time) {
     const stats = gameData[gameType];
@@ -970,22 +490,22 @@ function updateGameStatsUI() {
         
         if (gameType === 'number-guess') {
             const attemptsElement = document.getElementById('number-attempts');
-            if (attemptsElement) attemptsElement.textContent = stats.best || '-'; // 최고 점수로 변경
+            if (attemptsElement) attemptsElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
         } else if (gameType === 'memory-card') {
             const movesElement = document.getElementById('memory-moves');
-            if (movesElement) movesElement.textContent = stats.best || '-'; // 최고 점수로 변경
+            if (movesElement) movesElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
         } else if (gameType === 'puzzle') {
             const movesElement = document.getElementById('puzzle-moves');
-            if (movesElement) movesElement.textContent = stats.best || '-'; // 최고 점수로 변경
+            if (movesElement) movesElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
         } else if (gameType === 'typing') {
             const wpmElement = document.getElementById('typing-wpm');
-            if (wpmElement) wpmElement.textContent = stats.best || '-'; // 최고 점수로 변경
+            if (wpmElement) wpmElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
         } else if (gameType === 'color-match') {
             const accuracyElement = document.getElementById('color-accuracy');
-            if (accuracyElement) accuracyElement.textContent = stats.best || '-'; // 이미 최고 점수
+            if (accuracyElement) accuracyElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
         } else if (gameType === 'reaction') {
             const avgElement = document.getElementById('reaction-avg');
-            if (avgElement) avgElement.textContent = stats.best || '-'; // 이미 최고 점수
+            if (avgElement) avgElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
         }
     });
 }
@@ -1015,24 +535,36 @@ async function changeLeaderboardTab(gameType, event) {
         const item = document.createElement('div');
         item.className = 'leaderboard-item';
         
-        // 유저명과 유저ID 표시 형식 결정
-        let playerDisplay = '';
-        if (entry.playerName && entry.playerName !== '익명') {
-            if (entry.playerId) {
-                playerDisplay = `${entry.playerName}(${entry.playerId})`;
-            } else {
-                playerDisplay = entry.playerName;
-            }
+        // 게임 섹션과 동일한 방식으로 플레이어명 표시
+        const playerDisplay = getBestScoreText(entry.score, entry.playerName, entry.playerId);
+        
+        const scoreLabel = gameType === 'typing' ? `${Math.round(entry.score * 100) / 100}초` : `${Math.round(entry.score * 100) / 100}`;
+        
+        // 한국 시간 형식으로 표시 (YYYY-MM-DD HH:MM:SS)
+        let dateDisplay;
+        if (entry.koreanDate) {
+            // koreanDate가 있으면 그대로 사용
+            dateDisplay = entry.koreanDate;
         } else {
-            playerDisplay = entry.playerId || '익명';
+            // 기존 데이터는 date를 한국 시간으로 변환
+            const koreanTime = new Date(entry.date).toLocaleString('ko-KR', {
+                timeZone: 'Asia/Seoul',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            dateDisplay = koreanTime;
         }
         
-        const scoreLabel = gameType === 'typing' ? `${entry.score}초` : `${entry.score}`;
         item.innerHTML = `
             <span>${entry.rank}</span>
             <span>${playerDisplay}</span>
             <span>${scoreLabel}</span>
-            <span>${new Date(entry.date).toLocaleDateString()}</span>
+            <span>${dateDisplay}</span>
         `;
         leaderboardList.appendChild(item);
     });
@@ -1164,9 +696,9 @@ async function updateOverallStats() {
             const data = await response.json();
             console.log('📊 전체 통계 로드됨:', data);
             
-            // 시간을 분:초 형식으로 변환
+            // 시간을 분:초 형식으로 변환 (정수로 표시)
             const totalMinutes = Math.floor(data.totalTime / 60);
-            const totalSeconds = data.totalTime % 60;
+            const totalSeconds = Math.floor(data.totalTime % 60); // Math.floor 추가
             const timeDisplay = totalMinutes > 0 
                 ? `${totalMinutes}분 ${totalSeconds}초`
                 : `${totalSeconds}초`;

@@ -20,15 +20,15 @@ window.Games.loadColorMatchGame = function(deps) {
                 <button class="btn btn-secondary" id="new-game-btn">새 게임</button>
             </div>
             <div class="game-area">
-                <div class="game-instruction" style="text-align: center; margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                <div class="game-instruction" style="text-align: center; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">
                     📝 <strong>게임 룰:</strong> 아래 텍스트의 <strong>색상</strong>과 같은 색상의 버튼을 선택하세요!
                 </div>
-                <div id="color-display" style="width: 200px; height: 100px; margin: 1rem auto; border-radius: 10px; border: 3px solid var(--border-color);"></div>
-                <div id="color-text" style="font-size: 1.5rem; margin: 1rem 0; color: var(--text-primary); font-weight: bold;"></div>
-                <div class="game-instruction" style="text-align: center; margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.8rem;">
+                <div id="color-display" style="width: 180px; height: 80px; margin: 0.5rem auto; border-radius: 10px; border: 3px solid var(--border-color);"></div>
+                <div id="color-text" style="font-size: 1.3rem; margin: 0.5rem 0; color: var(--text-primary); font-weight: bold;"></div>
+                <div class="game-instruction" style="text-align: center; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.75rem;">
                     ↓ 텍스트 색상과 같은 버튼을 클릭하세요 ↓
                 </div>
-                <div id="color-options" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 400px; margin: 0 auto;"></div>
+                <div id="color-options" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; max-width: 350px; margin: 0 auto;"></div>
             </div>
         </div>
     `;
@@ -73,7 +73,7 @@ window.Games.loadColorMatchGame = function(deps) {
             option.className = 'btn btn-primary';
             option.style.cssText = `
                 width: 100%;
-                height: 60px;
+                height: 50px; /* 60px에서 50px로 감소 */
                 background: ${color};
                 border: 3px solid transparent;
                 border-radius: 10px;
@@ -109,22 +109,24 @@ window.Games.loadColorMatchGame = function(deps) {
         });
     }
     
-    // 새로운 점수 계산 함수 (100점 만점)
-    function calculateScore(accuracy, timeTaken) {
+    // 새로운 점수 계산 함수 (100점 만점, 밀리초 단위)
+    function calculateScore(accuracy, timeTakenMs) {
         // 정답률 점수 (10%)
         const accuracyScore = (accuracy / 100) * 10;
         
-        // 걸린시간 점수 (90%) - 10초까지는 90점, 그 이후로는 시간에 따라 감소
+        // 걸린시간 점수 (90%) - 밀리초 단위로 더 정밀한 계산
+        const timeTakenSeconds = timeTakenMs / 1000; // 밀리초를 초로 변환
+        
         let timeScore;
-        if (timeTaken <= 10) {
+        if (timeTakenSeconds <= 10) {
             timeScore = 90; // 10초까지는 만점
         } else {
             // 10초 이후로는 선형적으로 감소 (10초 = 90점, 100초 = 0점)
-            timeScore = Math.max(0, 90 - ((timeTaken - 10) * 1)); // 1초당 1점씩 감소
+            timeScore = Math.max(0, 90 - ((timeTakenSeconds - 10) * 1)); // 1초당 1점씩 감소
         }
         
-        // 총점 계산 (소수점 첫째자리까지 반올림)
-        const totalScore = Math.round((accuracyScore + timeScore) * 10) / 10;
+        // 총점 계산 (소수점 둘째자리까지 반올림 - 더 정밀한 점수)
+        const totalScore = Math.round((accuracyScore + timeScore) * 100) / 100;
         
         return Math.max(0, Math.min(100, totalScore)); // 0~100점 범위 제한
     }
@@ -135,13 +137,14 @@ window.Games.loadColorMatchGame = function(deps) {
         correctSpan.textContent = correctAnswers;
         accuracySpan.textContent = Math.round((correctAnswers / totalAnswers) * 100);
         if (totalAnswers >= 10) {
-            const timeTaken = Math.floor((Date.now() - gameStartTime) / 1000);
+            const timeTakenMs = Date.now() - gameStartTime; // 밀리초 단위로 시간 측정
+            const timeTakenSeconds = Math.round(timeTakenMs / 1000 * 100) / 100; // 소수점 둘째자리까지 표시
             const accuracy = Math.round((correctAnswers / totalAnswers) * 100);
-            const finalScore = calculateScore(accuracy, timeTaken);
+            const finalScore = calculateScore(accuracy, timeTakenMs);
             
             setTimeout(() => {
-                alert(`게임 종료!\n정확도: ${accuracy}%\n걸린 시간: ${timeTaken}초\n최종 점수: ${finalScore}점`);
-                updateGameStats('color-match', finalScore, timeTaken);
+                alert(`게임 종료!\n정확도: ${accuracy}%\n걸린 시간: ${timeTakenSeconds}초\n최종 점수: ${finalScore}점`);
+                updateGameStats('color-match', finalScore, timeTakenSeconds); // 밀리초를 초로 변환한 값을 저장
             }, 500);
         } else {
             roundSpan.textContent = totalAnswers + 1;

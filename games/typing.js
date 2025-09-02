@@ -59,23 +59,25 @@ window.Games.loadTypingGame = function(deps) {
     }
     
     function endGame() {
-        const timeTakenSec = Math.round((Date.now() - startTime) / 1000); // 초 단위 반올림
+        const timeTakenMs = Date.now() - startTime; // 밀리초 단위로 시간 측정
+        const timeTakenSec = Math.round(timeTakenMs / 1000 * 100) / 100; // 소수점 둘째자리까지 표시
         const accuracy = Math.round((correctChars / totalChars) * 100) || 0;
         
         typingInput.disabled = true;
         wordDisplay.textContent = `게임 종료! 시간: ${timeTakenSec}초, 정확도: ${accuracy}%`;
         timerDiv.textContent = '';
         
-        // 점수(score)에는 걸린 시간(초)을 저장, 낮을수록 좋음
+        // 점수(score)에는 걸린 시간(초, 소수점 둘째자리까지)을 저장, 낮을수록 좋음
         updateGameStats('typing', timeTakenSec, accuracy);
     }
     
     function updateStats() {
         if (startTime) {
-            const timeElapsedSec = Math.round((Date.now() - startTime) / 1000);
+            const timeElapsedMs = Date.now() - startTime; // 밀리초 단위로 시간 측정
+            const timeElapsedSec = Math.round(timeElapsedMs / 1000 * 100) / 100; // 소수점 둘째자리까지 표시
             const accuracy = Math.round((correctChars / totalChars) * 100) || 0;
             
-            wpmSpan.textContent = timeElapsedSec; // 현재 경과 시간(초)
+            wpmSpan.textContent = timeElapsedSec; // 현재 경과 시간(초, 소수점 둘째자리까지)
             accuracySpan.textContent = accuracy;
             timerDiv.textContent = `${timeElapsedSec}초`;
         }

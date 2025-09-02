@@ -490,7 +490,7 @@ section {
     padding: 0;
     border-radius: 20px;
     width: 90%;
-    max-width: 600px;
+    max-width: 90%;
     overflow-y: auto;
     box-shadow: var(--shadow-heavy);
     animation: modalSlideIn 0.3s ease;
@@ -764,6 +764,221 @@ section {
     margin-bottom: 2rem;
 }
 
+/* 테트리스 게임 스타일 */
+.tetris-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    max-width: 90%;
+    margin: 0 auto;
+    
+    max-height: 100vh;
+}
+
+.tetris-left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+.tetris-right-panel {
+       display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+.tetris-center-section {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.tetris-right-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 280px;
+    max-width: 320px;
+    flex-shrink: 0;
+}
+
+.tetris-board {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 1px;
+    width: 300px;
+    height: 540px;
+    max-height: calc(100vh - 200px);
+    background-color: var(--border-color);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 5px;
+    margin: 0 auto;
+}
+
+.tetris-cell {
+    width: 28px;
+    height: 28px;
+    background-color: var(--bg-secondary);
+    border-radius: 2px;
+    transition: background-color 0.1s ease;
+}
+
+.game-info {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 1.5rem;
+    min-width: 200px;
+}
+
+.game-info h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.info-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: var(--bg-primary);
+    border-radius: 8px;
+}
+
+.info-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.info-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.next-target-container {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    min-width: 200px;
+}
+
+.next-target-container h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.next-target-text {
+    margin: 0;
+    padding: 0.5rem;
+    background: var(--bg-primary);
+    border-radius: 5px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.next-piece-container {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    min-width: 120px;
+}
+
+.next-piece-container h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.next-piece {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    background-color: var(--bg-primary);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.next-cell {
+    width: 16px;
+    height: 16px;
+    border-radius: 1px;
+    background-color: var(--bg-secondary);
+    transition: background-color 0.1s ease;
+}
+
+.game-info-panel {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.game-info-panel h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.controls-list {
+    margin: 0;
+    padding-left: 1.5rem;
+    list-style: none;
+}
+
+.controls-list li {
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.key {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.game-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.game-controls .btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .hamburger {
@@ -838,6 +1053,98 @@ section {
     .modal-content {
         width: 95%;
         margin: 10% auto;
+    }
+
+    .game-area {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tetris-layout {
+        max-width: 100%;
+        gap: 1rem;
+        height: auto;
+        max-height: none;
+    }
+    
+    .tetris-top-panel {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .tetris-bottom-panel {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .next-target-container {
+        order: 1;
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .tetris-center-section {
+        order: 2;
+    }
+    
+    .tetris-right-section {
+        order: 3;
+        min-width: auto;
+        max-width: none;
+        width: 100%;
+    }
+    
+    .tetris-board {
+        width: 250px;
+        height: 450px;
+        max-height: 450px;
+    }
+    
+    .tetris-cell {
+        width: 23px;
+        height: 23px;
+    }
+    
+    .next-piece {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .next-cell {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .game-controls {
+        flex-direction: column;
+    }
+    
+    .game-controls .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .tetris-board {
+        width: 200px;
+        height: 360px;
+    }
+    
+    .tetris-cell {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .next-piece {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .next-cell {
+        width: 10px;
+        height: 10px;
     }
 }
 

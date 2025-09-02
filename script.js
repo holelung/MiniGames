@@ -87,25 +87,27 @@ function updatePlayerDisplay() {
     }
 }
 
-// 게임 데이터 (로컬 캐시)
-let gameData = {
-    'number-guess': { best: 0, attempts: 0, games: 0 },
-    'memory-card': { best: 0, moves: 0, games: 0 },
-    'puzzle': { best: 0, moves: 0, games: 0 },
-    'typing': { best: 0, time: 0, games: 0 },
-    'color-match': { best: 0, time: 0, games: 0 },
-    'reaction': { best: 0, time: 0, games: 0 }
-};
+    // 게임 데이터 (로컬 캐시)
+    let gameData = {
+        'number-guess': { best: 0, attempts: 0, games: 0 },
+        'memory-card': { best: 0, moves: 0, games: 0 },
+        'puzzle': { best: 0, moves: 0, games: 0 },
+        'typing': { best: 0, time: 0, games: 0 },
+        'color-match': { best: 0, time: 0, games: 0 },
+        'reaction': { best: 0, time: 0, games: 0 },
+        'tetris': { best: 0, difficulty: 0, games: 0 }
+    };
 
-// 랭킹 데이터
-let leaderboardData = {
-    'number-guess': [],
-    'memory-card': [],
-    'puzzle': [],
-    'typing': [],
-    'color-match': [],
-    'reaction': []
-};
+    // 랭킹 데이터
+    let leaderboardData = {
+        'number-guess': [],
+        'memory-card': [],
+        'puzzle': [],
+        'typing': [],
+        'color-match': [],
+        'reaction': [],
+        'tetris': []
+    };
 
 // 테마 토글 기능
 function toggleTheme() {
@@ -176,12 +178,15 @@ function openModal(gameType) {
         'puzzle': '슬라이딩 퍼즐',
         'typing': '타자 게임',
         'color-match': '색상 맞추기',
-        'reaction': '반응 속도 테스트'
+        'reaction': '반응 속도 테스트',
+        'tetris': '테트리스'
     };
     
-    const bestScore = gameData[gameType].best || 0;
-    const bestPlayerName = gameData[gameType].bestPlayerName;
-    const bestPlayerId = gameData[gameType].bestPlayerId;
+    // gameData[gameType]이 존재하지 않을 경우를 대비한 안전한 처리
+    const gameStats = gameData[gameType] || { best: 0, bestPlayerName: null, bestPlayerId: null };
+    const bestScore = gameStats.best || 0;
+    const bestPlayerName = gameStats.bestPlayerName;
+    const bestPlayerId = gameStats.bestPlayerId;
     const bestScoreText = getBestScoreText(bestScore, bestPlayerName, bestPlayerId);
     
     modalTitle.innerHTML = `
@@ -195,7 +200,8 @@ function openModal(gameType) {
 
 // 최고 기록 텍스트 생성 (유저 이름 포함)
 function getBestScoreText(bestScore, playerName = null, playerId = null, fullText = false) {
-    if (!bestScore || bestScore === 0) return '아직 기록 없음';
+    // 0도 유효한 점수로 인정. null/undefined만 기록 없음 처리
+    if (bestScore === undefined || bestScore === null) return '아직 기록 없음';
     
     // 유저 이름이 있으면 유저명(유저ID) 형식으로 반환
     if (playerName && playerName !== '익명' && playerName !== null) {
@@ -239,6 +245,10 @@ async function loadBestScores() {
                     gameData[gameType].best = bestData.bestScore;
                     gameData[gameType].bestPlayerName = bestData.playerName;
                     gameData[gameType].bestPlayerId = bestData.playerId;
+                    // 테트리스 난이도 동기화
+                    if (gameType === 'tetris') {
+                        gameData[gameType].difficulty = bestData.difficulty || gameData[gameType].difficulty;
+                    }
                 }
             });
             
@@ -304,11 +314,22 @@ function loadGame(gameType) {
                 console.error('Reaction module not loaded');
             }
             break;
+        case 'tetris':
+            if (window.Games && window.Games.loadTetrisGame) {
+                window.Games.loadTetrisGame({ gameContainer, updateGameStats });
+            } else {
+                console.error('Tetris module not loaded');
+            }
+            break;
     }
 }
 
 // 게임 통계 업데이트 (MongoDB 연동)
-async function updateGameStats(gameType, score, time) {
+async function updateGameStats(gameType, score, time, difficulty) {
+    // 안전 가드: 해당 게임 키가 없으면 기본 구조 생성
+    if (!gameData[gameType]) {
+        gameData[gameType] = { best: 0, games: 0 };
+    }
     const stats = gameData[gameType];
     stats.games++;
     
@@ -318,7 +339,7 @@ async function updateGameStats(gameType, score, time) {
         if (!stats.best || score < stats.best) {
             stats.best = score;
         }
-    } else if (gameType === 'color-match' || gameType === 'puzzle') {
+    } else if (gameType === 'color-match' || gameType === 'puzzle' || gameType === 'tetris') {
         // 높은 점수가 좋은 게임
         if (!stats.best || score > stats.best) {
             stats.best = score;
@@ -357,6 +378,12 @@ async function updateGameStats(gameType, score, time) {
             stats.personalBest = score;
         }
         stats.avg = time;
+    } else if (gameType === 'tetris') {
+        if (!stats.personalBest || score > stats.personalBest) {
+            stats.personalBest = score;
+        }
+        stats.score = score; // 테트리스 점수 저장
+        stats.difficulty = difficulty || 'normal'; // 난이도 정보도 저장
     }
     
     // 로컬 스토리지에 저장 (캐시)
@@ -375,7 +402,7 @@ async function updateGameStats(gameType, score, time) {
                 playerName: getPlayerName(),
                 score,
                 time,
-                difficulty: 'normal'
+                difficulty: difficulty || 'normal'
             })
         });
         
@@ -459,7 +486,8 @@ function updateGameStatsUI() {
             'puzzle': 'puzzle',
             'typing': 'typing',
             'color-match': 'color',
-            'reaction': 'reaction'
+            'reaction': 'reaction',
+            'tetris': 'tetris'
         };
         const idPrefix = idPrefixMap[gameType] || gameType.replace('-', '');
         const bestElement = document.getElementById(`${idPrefix}-best`);
@@ -471,7 +499,7 @@ function updateGameStatsUI() {
                 bestPlayerId: stats.bestPlayerId
             });
             
-            // 최고 기록에 유저명(유저ID) 표시
+            // 최고 기록에 유저명(유저ID) 표시 (테트리스 포함 동일 처리)
             const bestScoreText = getBestScoreText(stats.best, stats.bestPlayerName, stats.bestPlayerId);
             bestElement.textContent = bestScoreText;
             
@@ -558,6 +586,14 @@ function updateGameStatsUI() {
         } else if (gameType === 'reaction') {
             const avgElement = document.getElementById('reaction-avg');
             if (avgElement) avgElement.textContent = stats.best ? Math.round(stats.best * 100) / 100 : '-'; // 소수점 둘째자리까지 표시
+        } else if (gameType === 'tetris') {
+            const scoreElement = document.getElementById('tetris-score');
+            if (scoreElement) {
+                const sourceVal = (stats.best !== undefined && stats.best !== null) ? stats.best : stats.score;
+                const hasVal = (sourceVal !== undefined && sourceVal !== null);
+                const bestVal = hasVal ? Math.round(sourceVal * 100) / 100 : null;
+                scoreElement.textContent = hasVal ? ` ${bestVal}점 / ${stats.difficulty || '-'}` : '-';
+            }
         }
     });
 }
@@ -593,6 +629,7 @@ async function changeLeaderboardTab(gameType, event) {
         const scoreLabel = gameType === 'typing' ? `${Math.round(entry.score * 100) / 100}점` : 
                           gameType === 'puzzle' ? `${Math.round(entry.score * 100) / 100}점` :
                           gameType === 'memory-card' ? `${Math.round(entry.score * 100) / 100}점` :
+                          gameType === 'tetris' ? `${Math.round(entry.score * 100) / 100}점 / ${entry.difficulty || '-'}` :
                           gameType === 'number-guess' ? `${Math.round(entry.score * 100) / 100}회` :
                           gameType === 'reaction' ? `${Math.round(entry.score * 100) / 100}ms` :
                           `${Math.round(entry.score * 100) / 100}`;
@@ -635,7 +672,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     // 저장된 데이터 로드 (로컬 캐시)
     const savedGameData = localStorage.getItem('gameData');
     if (savedGameData) {
-        gameData = JSON.parse(savedGameData);
+        const parsed = JSON.parse(savedGameData);
+        // 기본 구조와 병합하여 누락된 게임 타입이 없도록 보정
+        gameData = Object.assign({}, gameData, parsed);
+        // 각 게임 항목도 최소 필드를 보장
+        Object.keys(gameData).forEach(key => {
+            const base = { best: 0, games: 0 };
+            gameData[key] = Object.assign({}, base, gameData[key] || {});
+        });
     }
     
     // 플레이어 이름 표시 초기화

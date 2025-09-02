@@ -107,6 +107,7 @@ app.get('/api/leaderboard/:gameType', async (req, res) => {
         // typing은 새로운 점수 계산 방식으로 높을수록 좋음
         // memory-card는 새로운 점수 계산 방식으로 높을수록 좋음
         // puzzle은 새로운 점수 계산 방식으로 높을수록 좋음
+        // tetris는 점수가 높을수록 좋음
         const sortOrder = ['number-guess', 'reaction'].includes(gameType) 
             ? { score: 1 }  // 낮을수록 좋음
             : { score: -1 }; // 높을수록 좋음
@@ -126,6 +127,7 @@ app.get('/api/leaderboard/:gameType', async (req, res) => {
                 playerName: entry.playerName || '익명',
                 score: entry.score,
                 time: entry.time,
+                difficulty: entry.difficulty,
                 date: entry.date,
                 koreanDate: entry.koreanDate
             }))
@@ -162,6 +164,7 @@ app.get('/api/best-score/:gameType', async (req, res) => {
                 bestScore: bestRecord[0].score,
                 playerName: bestRecord[0].playerName || '익명',
                 playerId: bestRecord[0].playerId,
+                difficulty: bestRecord[0].difficulty,
                 date: bestRecord[0].date
             });
         } else {
@@ -171,6 +174,7 @@ app.get('/api/best-score/:gameType', async (req, res) => {
                 bestScore: 0,
                 playerName: null,
                 playerId: null,
+                difficulty: null,
                 date: null
             });
         }
@@ -185,14 +189,14 @@ app.get('/api/best-score/:gameType', async (req, res) => {
 app.get('/api/best-scores', async (req, res) => {
     try {
         const db = client.db('games');
-        const gameTypes = ['number-guess', 'memory-card', 'puzzle', 'typing', 'color-match', 'reaction'];
+        const gameTypes = ['number-guess', 'memory-card', 'puzzle', 'typing', 'color-match', 'reaction', 'tetris'];
         const bestScores = {};
         
         for (const gameType of gameTypes) {
-                    // 게임 타입별로 정렬 기준 결정 (typing은 점수가 높을수록 좋음)
-        const sortOrder = ['number-guess', 'reaction'].includes(gameType) 
-            ? { score: 1 }  // 낮을수록 좋음
-            : { score: -1 }; // 높을수록 좋음
+            // 게임 타입별로 정렬 기준 결정 (tetris는 점수가 높을수록 좋음)
+            const sortOrder = ['number-guess', 'reaction'].includes(gameType) 
+                ? { score: 1 }  // 낮을수록 좋음
+                : { score: -1 }; // 높을수록 좋음
             
             console.log(`🔍 ${gameType} 정렬 기준:`, sortOrder);
             
@@ -208,6 +212,7 @@ app.get('/api/best-scores', async (req, res) => {
                     bestScore: bestRecord[0].score,
                     playerName: bestRecord[0].playerName || '익명',
                     playerId: bestRecord[0].playerId,
+                    difficulty: bestRecord[0].difficulty,
                     date: bestRecord[0].date
                 };
             } else {
@@ -216,6 +221,7 @@ app.get('/api/best-scores', async (req, res) => {
                     bestScore: 0,
                     playerName: null,
                     playerId: null,
+                    difficulty: null,
                     date: null
                 };
             }

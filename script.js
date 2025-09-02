@@ -16,9 +16,40 @@ const savePlayerNameBtn = document.getElementById('save-player-name');
 const currentPlayerDisplay = document.getElementById('current-player-display');
 
 // API 기본 URL - 환경에 따라 동적 설정
-const API_BASE_URL = 'https://minigames-7s1x.onrender.com' + '/api';
+const API_BASE_URL = (() => {
+    // 개발 환경 감지
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' || 
+                        window.location.port === '3000' ||
+                        window.location.protocol === 'file:';
+    
+    if (isDevelopment) {
+        console.log('🔧 개발 환경 감지됨 - 로컬 서버 사용');
+        return 'http://localhost:3000/api';
+    } else {
+        console.log('🚀 배포 환경 감지됨 - Render 서버 사용');
+        return 'https://minigames-7s1x.onrender.com/api';
+    }
+})();
 
-// 플레이어 ID 및 이름 관리
+// 앱 버전 로드
+async function loadAppVersion() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/app-info`);
+        if (response.ok) {
+            const data = await response.json();
+            const versionBadge = document.querySelector('.version-badge');
+            if (versionBadge) {
+                versionBadge.textContent = `v${data.version}`;
+                console.log(`📦 앱 버전 로드됨: v${data.version}`);
+            }
+        } else {
+            console.error('❌ 앱 버전 로드 실패:', response.statusText);
+        }
+    } catch (error) {
+        console.error('❌ 앱 버전 네트워크 오류:', error);
+    }
+}
 function getPlayerId() {
     let playerId = localStorage.getItem('playerId');
     if (!playerId) {
@@ -601,6 +632,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // 플레이어 이름 표시 초기화
     updatePlayerDisplay();
+    
+    // 앱 버전 로드
+    await loadAppVersion();
     
     // 게임별 최고 기록 로드 (먼저)
     await loadBestScores();

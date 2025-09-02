@@ -447,6 +447,7 @@ section {
 
 .game-stats {
     display: flex;
+    flex-direction: column;
     justify-content: space-around;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;

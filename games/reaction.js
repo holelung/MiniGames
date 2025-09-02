@@ -7,6 +7,7 @@ window.Games.loadReactionGame = function(deps) {
     let reactionTimes = [];
     let round = 1;
     let isWaiting = false;
+    let isGameActive = true;
     
     gameContainer.innerHTML = `
         <div class="game-container">
@@ -44,9 +45,10 @@ window.Games.loadReactionGame = function(deps) {
         reactionArea.textContent = '대기 중...';
         reactionArea.style.backgroundColor = 'var(--bg-secondary)';
         isWaiting = true;
+        isGameActive = true;
         const delay = Math.random() * 3000 + 1000;
         setTimeout(() => {
-            if (isWaiting) {
+            if (isWaiting && isGameActive) {
                 reactionArea.textContent = '클릭하세요!';
                 reactionArea.style.backgroundColor = 'var(--success-color)';
                 startTime = Date.now();
@@ -55,6 +57,17 @@ window.Games.loadReactionGame = function(deps) {
     }
     
     reactionArea.addEventListener('click', () => {
+        if (!isGameActive) return;
+        
+        if (isWaiting && startTime === 0) {
+            // 미리 클릭한 경우
+            isGameActive = false;
+            isWaiting = false;
+            reactionArea.textContent = '미리누르는 것은 반칙입니다! 새로 게임을 시작해주세요';
+            reactionArea.style.backgroundColor = 'var(--error-color)';
+            return;
+        }
+        
         if (startTime > 0 && reactionArea.style.backgroundColor === 'var(--success-color)') {
             const reactionTime = Date.now() - startTime;
             reactionTimes.push(reactionTime);
@@ -73,6 +86,7 @@ window.Games.loadReactionGame = function(deps) {
     startBtn.addEventListener('click', () => {
         round = 1;
         reactionTimes = [];
+        isGameActive = true;
         startRound();
     });
     

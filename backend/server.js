@@ -2,7 +2,12 @@ const express = require('express');
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
+
+// package.json에서 버전 정보 읽기 (Render 구조에 맞게 루트의 package.json 사용)
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+const APP_VERSION = packageJson.version;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -327,6 +332,23 @@ app.get('/api/overall-stats', async (req, res) => {
     }
 });
 
+// 앱 정보 API (버전 등)
+app.get('/api/app-info', async (req, res) => {
+    try {
+        res.json({
+            success: true,
+            version: APP_VERSION,
+            name: packageJson.name,
+            description: packageJson.description,
+            author: packageJson.author,
+            license: packageJson.license
+        });
+    } catch (error) {
+        console.error('❌ 앱 정보 조회 실패:', error);
+        res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+    }
+});
+
 // 서버 시작
 async function startServer() {
     await connectToDatabase();
@@ -334,6 +356,7 @@ async function startServer() {
     app.listen(PORT, () => {
         console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다!`);
         console.log(`📱 http://localhost:${PORT} 에서 접속하세요`);
+        console.log(`📦 앱 버전: v${APP_VERSION}`);
     });
 }
 

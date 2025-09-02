@@ -184,7 +184,12 @@ function getBestScoreText(bestScore, playerName = null, playerId = null, fullTex
 // 게임별 최고 기록 로드 (서버에서)
 async function loadBestScores() {
     try {
-        const response = await fetch(`${API_BASE_URL}/best-scores`);
+        const response = await fetch(`${API_BASE_URL}/best-scores?t=${Date.now()}`, {
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
         
         if (response.ok) {
             const data = await response.json();
@@ -194,6 +199,7 @@ async function loadBestScores() {
             Object.keys(data.bestScores).forEach(gameType => {
                 if (gameData[gameType]) {
                     const bestData = data.bestScores[gameType];
+                    console.log(`📊 ${gameType} 최고 기록 설정:`, bestData.bestScore, bestData.playerName);
                     gameData[gameType].best = bestData.bestScore;
                     gameData[gameType].bestPlayerName = bestData.playerName;
                     gameData[gameType].bestPlayerId = bestData.playerId;
@@ -271,12 +277,12 @@ async function updateGameStats(gameType, score, time) {
     stats.games++;
     
     // 최고 점수 업데이트 (전체 최고 기록용)
-    if (gameType === 'number-guess' || gameType === 'memory-card' || gameType === 'puzzle' || gameType === 'reaction' || gameType === 'typing') {
+    if (gameType === 'number-guess' || gameType === 'memory-card' || gameType === 'reaction' || gameType === 'typing') {
         // 낮은 점수가 좋은 게임들
         if (!stats.best || score < stats.best) {
             stats.best = score;
         }
-    } else if (gameType === 'color-match') {
+    } else if (gameType === 'color-match' || gameType === 'puzzle') {
         // 높은 점수가 좋은 게임
         if (!stats.best || score > stats.best) {
             stats.best = score;
@@ -289,8 +295,13 @@ async function updateGameStats(gameType, score, time) {
             stats.personalBest = score;
         }
         stats.attempts = score;
-    } else if (gameType === 'memory-card' || gameType === 'puzzle') {
+    } else if (gameType === 'memory-card') {
         if (!stats.personalBest || score < stats.personalBest) {
+            stats.personalBest = score;
+        }
+        stats.moves = score;
+    } else if (gameType === 'puzzle') {
+        if (!stats.personalBest || score > stats.personalBest) {
             stats.personalBest = score;
         }
         stats.moves = score;
@@ -355,7 +366,12 @@ async function updateGameStats(gameType, score, time) {
 // 리더보드 로드 (MongoDB에서)
 async function loadLeaderboard(gameType) {
     try {
-        const response = await fetch(`${API_BASE_URL}/leaderboard/${gameType}?limit=10`);
+        const response = await fetch(`${API_BASE_URL}/leaderboard/${gameType}?limit=10&t=${Date.now()}`, {
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
         
         if (response.ok) {
             const data = await response.json();
@@ -387,7 +403,7 @@ async function loadPlayerStats() {
                 }
             });
             
-            updateGameStatsUI();
+            // UI 업데이트는 loadBestScores에서 처리하므로 여기서는 호출하지 않음
         } else {
             console.error('❌ 플레이어 통계 로드 실패:', response.statusText);
         }
@@ -538,7 +554,9 @@ async function changeLeaderboardTab(gameType, event) {
         // 게임 섹션과 동일한 방식으로 플레이어명 표시
         const playerDisplay = getBestScoreText(entry.score, entry.playerName, entry.playerId);
         
-        const scoreLabel = gameType === 'typing' ? `${Math.round(entry.score * 100) / 100}초` : `${Math.round(entry.score * 100) / 100}`;
+        const scoreLabel = gameType === 'typing' ? `${Math.round(entry.score * 100) / 100}초` : 
+                          gameType === 'puzzle' ? `${Math.round(entry.score * 100) / 100}점` :
+                          `${Math.round(entry.score * 100) / 100}`;
         
         // 한국 시간 형식으로 표시 (YYYY-MM-DD HH:MM:SS)
         let dateDisplay;
@@ -584,11 +602,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     // 플레이어 이름 표시 초기화
     updatePlayerDisplay();
     
-    // MongoDB에서 플레이어 통계 로드
-    await loadPlayerStats();
-    
-    // 게임별 최고 기록 로드
+    // 게임별 최고 기록 로드 (먼저)
     await loadBestScores();
+    
+    // MongoDB에서 플레이어 통계 로드 (나중에)
+    await loadPlayerStats();
     
     // 이벤트 리스너 등록
     themeToggleBtn.addEventListener('click', toggleTheme);

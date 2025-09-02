@@ -9,6 +9,43 @@ window.Games.loadPuzzleGame = function(deps) {
     let moves = 0;
     let gameStartTime = Date.now();
     
+    // 퍼즐 설정 (3x3 기준)
+    const PUZZLE_CONFIG = {
+        optimalMoves: 80,
+        timeCoefficient: 0.6,
+        optimalTime: 48 // 0.6 * 80
+    };
+    
+    // 새로운 점수 계산 함수
+    function calculatePuzzleScore(moves, timeSeconds) {
+        const M = moves;
+        const T = timeSeconds;
+        const M_star = PUZZLE_CONFIG.optimalMoves;
+        const T_star = PUZZLE_CONFIG.optimalTime;
+        
+        // 정규화 효율
+        const E_m = Math.min(1, M_star / M);
+        const E_t = Math.min(1, T_star / T);
+        
+        // 가중 조화평균
+        const w_m = 0.6, w_t = 0.4;
+        const E = (w_m + w_t) / (w_m/E_m + w_t/E_t);
+        
+        // 기본 점수
+        const baseScore = 80 * E;
+        
+        // 보너스 점수
+        let bonus = 0;
+        if (M <= M_star) bonus += 10;
+        if (T <= T_star) bonus += 5;
+        if (M <= M_star && T <= T_star) bonus += 5;
+        
+        // 최종 점수 (소수점 둘째자리까지)
+        const finalScore = Math.round((baseScore + bonus) * 100) / 100;
+        
+        return finalScore;
+    }
+    
     for (let i = 0; i < 100; i++) {
         const emptyIndex = tiles.indexOf(0);
         const possibleMoves = getPossibleMoves(emptyIndex, size);
@@ -83,9 +120,11 @@ window.Games.loadPuzzleGame = function(deps) {
             renderPuzzle();
             if (tiles.slice(0, -1).every((tile, i) => tile === i + 1) && tiles[tiles.length - 1] === 0) {
                 const timeTaken = Math.floor((Date.now() - gameStartTime) / 1000);
+                const finalScore = calculatePuzzleScore(moves, timeTaken);
+                
                 setTimeout(() => {
-                    alert(`🎉 축하합니다! ${moves}번의 이동으로 퍼즐을 완성했습니다! (${timeTaken}초)`);
-                    updateGameStats('puzzle', moves, timeTaken);
+                    alert(`🎉 축하합니다! ${moves}번의 이동으로 퍼즐을 완성했습니다! (${timeTaken}초)\n최종 점수: ${finalScore}점`);
+                    updateGameStats('puzzle', finalScore, timeTaken);
                 }, 500);
             }
         }

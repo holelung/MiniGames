@@ -11,6 +11,7 @@ window.Games.loadTypingGame = function(deps) {
     let startTime = null;
     let correctChars = 0;
     let totalChars = 0;
+    let updateInterval = null; // 실시간 업데이트를 위한 인터벌
     
     gameContainer.innerHTML = `
         <div class="game-container">
@@ -42,10 +43,12 @@ window.Games.loadTypingGame = function(deps) {
         currentWordIndex = 0;
         correctChars = 0;
         totalChars = 0;
-        startTime = Date.now();
+        // startTime은 첫 번째 키보드 입력 시에 설정
         displayNextWord();
         typingInput.disabled = false;
         typingInput.focus();
+        
+        // 실시간 시간 업데이트는 첫 번째 키보드 입력 시에 시작
     }
     
     function displayNextWord() {
@@ -62,6 +65,12 @@ window.Games.loadTypingGame = function(deps) {
         const timeTakenMs = Date.now() - startTime; // 밀리초 단위로 시간 측정
         const timeTakenSec = Math.round(timeTakenMs / 1000 * 100) / 100; // 소수점 둘째자리까지 표시
         const accuracy = Math.round((correctChars / totalChars) * 100) || 0;
+        
+        // 실시간 업데이트 중지
+        if (updateInterval) {
+            clearInterval(updateInterval);
+            updateInterval = null;
+        }
         
         typingInput.disabled = true;
         wordDisplay.textContent = `게임 종료! 시간: ${timeTakenSec}초, 정확도: ${accuracy}%`;
@@ -80,11 +89,20 @@ window.Games.loadTypingGame = function(deps) {
             wpmSpan.textContent = timeElapsedSec; // 현재 경과 시간(초, 소수점 둘째자리까지)
             accuracySpan.textContent = accuracy;
             timerDiv.textContent = `${timeElapsedSec}초`;
+        } else {
+            // 게임이 아직 시작되지 않았을 때
+            wpmSpan.textContent = '0';
+            accuracySpan.textContent = '0';
+            timerDiv.textContent = '게임을 시작하려면 타이핑하세요';
         }
     }
     
     typingInput.addEventListener('input', (e) => {
-        if (!startTime) startTime = Date.now();
+        if (!startTime) {
+            startTime = Date.now();
+            // 실시간 시간 업데이트 시작 (100ms마다)
+            updateInterval = setInterval(updateStats, 100);
+        }
         
         const currentWord = wordDisplay.textContent;
         const typedWord = e.target.value;
@@ -98,7 +116,8 @@ window.Games.loadTypingGame = function(deps) {
             }
         }
         
-        updateStats();
+        // updateStats()는 이제 setInterval에서 자동으로 호출되므로 제거
+        // updateStats();
         
         if (typedWord === currentWord) {
             currentWordIndex++;
@@ -106,7 +125,17 @@ window.Games.loadTypingGame = function(deps) {
         }
     });
     
-    newGameBtn.addEventListener('click', () => window.Games.loadTypingGame(deps));
+    newGameBtn.addEventListener('click', () => {
+        // 기존 인터벌 정리
+        if (updateInterval) {
+            clearInterval(updateInterval);
+            updateInterval = null;
+        }
+        window.Games.loadTypingGame(deps);
+    });
+    
+    // 게임 시작 시 초기 상태 표시
+    updateStats();
     
     startGame();
 };
